@@ -1,6 +1,5 @@
 from aereopuerto import Aereopuerto
 from clima import Clima
-from clima2 import obtener_clima
 
 
 def main():
@@ -9,6 +8,7 @@ def main():
     cache = Clima(181)
     cache.manejar_cache()
     print (cache.obtener_vuelo("kw9f0kwvZJmsukQy"))
+    print(cache.obtener_climaIATA("MTY"))
 main()
 
 

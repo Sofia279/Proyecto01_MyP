@@ -18,6 +18,12 @@ class Clima:
         for i in range(size):
             self.cache.append(list())
     
+     
+    def obtener_climaIATA(self, codigo):
+        i = self.buscar_aereopuerto(Aereopuerto(codigo ,0,0))
+        print(i)
+        if(i>-1):
+            return self.filtra_datos(self.cache[i][1])
     def buscar_aereopuerto(self, aereopuerto):
         for i in range(self.size):
             if(len(self.cache[(aereopuerto.__hash__()+i)%self.size]) == 0):
