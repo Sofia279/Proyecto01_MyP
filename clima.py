@@ -1,12 +1,10 @@
-import requests, time, json, csv
+import requests
+import time
+import json
+import csv
 import math
-
-from aereopuerto import Aereopuerto
-import csv, json
-import urllib
 import urllib.request
-import urllib.parse
-
+from aereopuerto import Aereopuerto
 from datos import Vuelo
 
 class Clima:
@@ -51,42 +49,38 @@ class Clima:
     def obtener_vuelo(self, id):
         for vuelo in self.vuelos:
             if(vuelo.id) == id:
-                return self.obtener_clima(vuelo.origen)+self.obtener_clima(vuelo.destino)
+                return self.obtener_clima(vuelo.origen) + self.obtener_clima(vuelo.destino)
             
     def peticion(self, aeropuerto):
         llave = "685b7a3831ba303b4603a5e7c8ab09be"
         url = "https://api.openweathermap.org/data/2.5/weather?lat="\
                     + str(aeropuerto.lat) + "&lon=" + str(aeropuerto.longi)\
                     + "&appid=" + llave + "&lang=es"
-        archivoPeticion = urllib.request.urlopen(url,timeout=30)
+        archivoPeticion = urllib.request.urlopen(url, timeout=30)
         return json.loads(archivoPeticion.read())
 
     def manejar_cache(self):
 
         # Se abre el archivo csv (la base de datos) en modo lectura
         with open('dataset2.csv', 'r') as archivo:
-        
-
             # Se ignora la primera fila (los títulos)
             next(archivo)
             lector = csv.reader(archivo)
             # Recorre el archivo fila por fila
             for fila in lector:
-                aereopuerto_origen = Aereopuerto (fila[1],fila[3],fila[4])
-                aereopuerto_destino = Aereopuerto (fila[2],fila[5],fila[6])
-                self.vuelos.append(Vuelo(fila[0],aereopuerto_origen, aereopuerto_destino))
+                aereopuerto_origen = Aereopuerto (fila[1], fila[3], fila[4])
+                aereopuerto_destino = Aereopuerto (fila[2], fila[5], fila[6])
+                self.vuelos.append(Vuelo(fila[0], aereopuerto_origen, aereopuerto_destino))
 
                 # Se verifica si la aereopuerto de origen ya esta en el cache
                 if(not self.buscar(aereopuerto_origen)):
-
                     datos_aereopuerto_origen = self.peticion(aereopuerto_origen)
                     i = self.buscar_casilla(aereopuerto_origen)
                     self.cache[i] = [aereopuerto_origen.nombre, datos_aereopuerto_origen]
                     # Esperar un tiempo para evitar exceder la limitación de OpenWeatherMap (60 peticiones por min)
-                
+
                 # Se verifica si la aereopuerto de destino ya esta en el cache
                 if(not self.buscar(aereopuerto_destino)):
-                    
                     datos_aereopuerto_destino = self.peticion(aereopuerto_destino)
                     i = self.buscar_casilla(aereopuerto_destino)
                     self.cache[i] = [aereopuerto_destino.nombre, datos_aereopuerto_destino]
@@ -96,13 +90,7 @@ class Clima:
         return self.cache
 
 
-    if __name__ == "__main__":
-        cache_actualizado = manejar_cache()
-
-
-    #for aereopuerto, datos in cache_actualizado.items():
-    #        print("Clima actual en", aereopuerto)
-    #        print("Temperatura:", datos['main']['temp'], "°C")
-    #        print("Humedad:", datos['main']['humidity'], "%")
-    #        print("Descripción:", datos['weather'][0]['description'])
-    #        print()
+if __name__ == "__main__":
+    size = 100
+    clima = Clima(size)  # Reemplaza 'size' con el tamaño deseado
+    cache_actualizado = clima.manejar_cache()
